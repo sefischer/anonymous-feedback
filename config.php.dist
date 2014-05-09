@@ -1,7 +1,7 @@
 <?php
 $config['enabled'] = true;
 
-$config['debug'] = true;
+$config['debug'] = false;
 
 if ($config['debug']) {
   error_reporting(E_ALL);
