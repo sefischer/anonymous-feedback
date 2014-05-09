@@ -1,0 +1,25 @@
+<?php
+$config['enabled'] = true;
+
+$config['debug'] = true;
+
+if ($config['debug']) {
+  error_reporting(E_ALL);
+} else {
+  error_reporting(0);
+}
+
+// Recipient addresses that appear above the separator line
+// in the drop-down
+$primary_recipients = array();
+$primary_recipients[] = array('wichtige Person',
+                              'kontakt@example.org');
+
+$secondary_recipients = array();
+$secondary_recipients[] = array('Wichtige Personengruppe',
+                                array('foo@example.org',
+                                      'bar@example.org',
+                                      'quuz@example.org'));
+
+$recaptcha_public_key = '';
+$recaptcha_private_key = '';
