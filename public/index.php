@@ -1,6 +1,7 @@
 <?php
 require_once('../config.php');
 require_once('../recaptchalib.php');
+require_once('../functions.php');
 
 // Stores error messages to display to the user
 $errors = array();
@@ -15,20 +16,11 @@ $cache_file = date('YmdH') . '.cache';
 
 /* delete old cache files */
 if (!$config['keep_caches']) {
-  $dirs = new DirectoryIterator('../cache');
-  foreach ($dirs as $file) {
-    if ($file->isDir()) {
-      continue;
-    }
-    if ($file->getFilename() != $cache_file) {
-      if (!unlink($file->getRealPath())) {
-        $errors[] = 'Ein Fehler ist aufgetreten (Alte Cache-Datei konnte nicht gelöscht werden).';
-        $config['enabled'] = false;
-        break;
-      }
-    }
+  if (!af_remove_old_caches($cache_file)) {
+    $errors[] = 'Ein Fehler ist aufgetreten (Alte Cache-Datei konnte nicht gelöscht werden).';
+    $config['enabled'] = false;
+    break;
   }
-unset($dirs);
 }
 
 /* check whether the rate limit has been exceeded */
@@ -48,13 +40,13 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
   /*
    * preparing user submitted content
   */
-  $message = trim($_POST['message']);
-  $message = htmlspecialchars($message);
+  $message = af_sanitize_message($_POST['message']);
 
   /*
    * Validations
    */
   $failed = false;
+
   /* captcha validation */
   $resp = recaptcha_check_answer ($recaptcha_private_key,
                                   $_SERVER["REMOTE_ADDR"],
@@ -65,6 +57,7 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $errors[] = "Du hast das Captcha (die zwei Wörter) nicht korrekt eingegeben. Bitte versuche es nochmal.";
   }
   unset($resp);
+
   /* validations on message */
   /* minimum length */
   if (!$failed && strlen($message) < 2) {
@@ -77,20 +70,10 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $errors[] = "Bitte gib nicht mehr als 5.000 Zeichen als Nachricht ein.";
   }
   /* recipient */
-  // TODO: make this logic nicer
   if (!$failed) {
-    $recipient = false;
-    $first_char = $_POST['recipient'][0];
-    $recp_id = substr($_POST['recipient'], 1);
-    // false -> secondary recp.
-    $recp_is_primary = ($first_char == 'p');
-
-    if ($recp_is_primary && array_key_exists($recp_id, $primary_recipients)) {
-      $recipient = $primary_recipients[$recp_id];
-    } elseif (!$recp_is_primary &&
-              array_key_exists($recp_id, $secondary_recipients)) {
-      $recipient = $secondary_recipients[$recp_id];
-    }
+    $recipient = af_parse_recipient($_POST['recipient'],
+                                    $primary_recipients,
+                                    $secondary_recipients);
 
     if (!$recipient) {
       $failed = true;
@@ -108,8 +91,7 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $message = $config['mail_prefix'] . "\n" . $message;
 
-    $message = wordwrap($message, 75, "\n", true);
-    $message = str_replace("\n", "\r\n", $message);
+    $message = af_format_message($message);
 
     // increment rate counter
     if (!file_put_contents($cache_path, 'm', FILE_APPEND)) {
@@ -123,16 +105,21 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
       $errors[] = 'Im Moment kannst du kein Feedback verschicken. Bitte probiere es in ca. einer Stunde nochmal. (2)';
       $config['enabled'] = false;
     }
-
     if (!$failed) {
       $success = true;
-    }
-    if (!$failed && !$config['mail_pretend']) {
       // actually send the mail
-      mail($recipient[1], $config['mail_subject'], $message, $headers);
+      if (!is_array($recipient[1])) {
+        $recipient[1] = array($recipient[1]);
+      }
+      foreach ($recipient[1] as $recp) {
+        if ($config['mail_pretend']) {
+          echo "mail($recp, ".$config['mail_subject'].", $message, $headers);";
+        } else {
+          mail($recp, $config['mail_subject'], $message, $headers);
+        }
+      }
     }
   }
-
 }
 ?>
 
