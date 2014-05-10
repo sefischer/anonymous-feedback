@@ -113,7 +113,9 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
       }
       foreach ($recipient[1] as $recp) {
         if ($config['mail_pretend']) {
-          echo "mail($recp, ".$config['mail_subject'].", $message, $headers);";
+          if ($config['debug']) {
+            echo "mail($recp, ".$config['mail_subject'].", $message, $headers);";
+          }
         } else {
           mail($recp, $config['mail_subject'], $message, $headers);
         }
