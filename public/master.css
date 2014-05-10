@@ -47,9 +47,21 @@ textarea {
 	font-family:monospace;
 	font-size: 120%;
 	padding: 6px;
-	margin-top: 15px;
-	margin-bottom: 15px;
+	margin-top: 7px;
+	margin-bottom: 4px;
 	display: block;
+}
+
+#char-counter {
+	font-size: 80%;
+	float: right;
+	color: #999;
+}
+
+/* Headings */
+h1,h2 {
+	width: 100%;
+	border-bottom: 1px solid #555;
 }
 
 /* error/confirmation states */
@@ -68,4 +80,9 @@ p.error,div.error {
 p.success,div.success {
 	border-color: #25C818;
 	background-color: #C1FEBB;
+}
+
+/* ReCaptcha */
+div.captcha-container {
+	margin: 10px;
 }

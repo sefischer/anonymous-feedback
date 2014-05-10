@@ -21,5 +21,17 @@ $secondary_recipients[] = array('Wichtige Personengruppe',
                                       'bar@example.org',
                                       'quuz@example.org'));
 
+// The maximum number of messages to send in an hour
+$config['ratelimit'] = 20;
+// When set to true, old cache files aren't deleted. This can be used
+// for quantitative usage tracking.
+$config['keep_caches'] = false;
+
+config['mail_from'] = 'Anonymous Feedback <noreply@example.org>';
+$config['mail_subject'] = 'Anonymous Feedback';
+$config['mail_prefix'] = '';
+// Set to true to don't actually send mails
+$config['mail_pretend'] = false;
+
 $recaptcha_public_key = '';
 $recaptcha_private_key = '';
