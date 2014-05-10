@@ -6,6 +6,9 @@ require_once('../functions.php');
 // Stores error messages to display to the user
 $errors = array();
 $success = false;
+if (!isset($_POST['recipient'])) {
+  $_POST['recipient'] = '';
+}
 
 /*
  * Check cache
@@ -19,7 +22,6 @@ if (!$config['keep_caches']) {
   if (!af_remove_old_caches($cache_file)) {
     $errors[] = 'Ein Fehler ist aufgetreten (Alte Cache-Datei konnte nicht gelöscht werden).';
     $config['enabled'] = false;
-    break;
   }
 }
 
@@ -112,11 +114,9 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
         $recipient[1] = array($recipient[1]);
       }
       foreach ($recipient[1] as $recp) {
-        if ($config['mail_pretend']) {
-          if ($config['debug']) {
-            echo "mail($recp, ".$config['mail_subject'].", $message, $headers);";
-          }
-        } else {
+        if ($config['mail_pretend'] && $config['debug']) {
+          echo "mail($recp, ".$config['mail_subject'].", $message, $headers);";
+        } elseif (!$config['mail_pretend']) {
           if (!mail($recp, $config['mail_subject'], $message, $headers)) {
             $success = false;
             $errors[] = 'Ein Fehler ist aufgetreten (Mail konnte nicht versendet werden).';
@@ -127,16 +127,23 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
     }
   }
 }
-?>
 
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n"; ?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
 <head>
   <title>Anonymes Feedback | Bakespace</title>
-  <link rel="stylesheet" href="master.css" type="text/css" media="all" charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="master.css" type="text/css" media="all" charset="utf-8"></link>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <script type="text/javascript">
+  var RecaptchaOptions = {
+     theme : 'white',
+     lang : 'de'
+  };
+  </script>
 </head>
 <body>
 <div id="wrapper">
@@ -161,26 +168,29 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
       <select name="recipient" id="recipient" size="1">
 <?php foreach($primary_recipients as $key => $recp): ?>
 <?php $selected = ($_POST['recipient'] == 'p' . $key) ?>
-        <option value="p<?php echo $key; ?>"<?php if ($selected) { echo ' selected'; } ?>><?php echo $recp[0] ?></option>
+        <option value="p<?php echo $key; ?>"<?php if ($selected) { echo ' selected="selected"'; } ?>><?php echo $recp[0] ?></option>
 <?php endforeach; ?>
-        <option disabled>_________</option>
+        <option disabled="disabled">_________</option>
 <?php foreach($secondary_recipients as $key => $recp): ?>
 <?php $selected = ($_POST['recipient'] == 's' . $key) ?>
-        <option value="s<?php echo $key; ?>"<?php if ($selected) { echo ' selected'; } ?>><?php echo $recp[0] ?></option>
+        <option value="s<?php echo $key; ?>"<?php if ($selected) { echo ' selected="selected"'; } ?>><?php echo $recp[0] ?></option>
 <?php endforeach; ?>
       </select><br />
     </p>
-    <label for="message">Deine Nachricht</label>
-    <textarea name="message" id="message" rows="8" cols="40"><?php
+    <div>
+      <label for="message">Deine Nachricht</label>
+      <textarea name="message" id="message" rows="8" cols="40"><?php
 if (isset($_POST['message'])) {
   echo htmlspecialchars($_POST['message']);
 }
 ?></textarea>
-    <div id="char-counter">
-    5000 Zeichen verfügbar.
+      <div id="char-counter">
+        5000 Zeichen verfügbar.
+      </div>
     </div>
-    <div style="clear: both;">
+    <div style="clear: both;" />
     <script type="text/javascript">
+    <!--
     var area = document.getElementById("message");
     var message = document.getElementById("char-counter");
     var maxLength = 5000;
@@ -192,6 +202,7 @@ if (isset($_POST['message'])) {
         }
     }
     setInterval(checkLength, 100);
+    -->
     </script>
     
     <div>Bitte tippe die beiden Wörter ein:</div>
@@ -204,7 +215,7 @@ if (isset($_POST['message'])) {
     <div class="note">
       Um uns vor Spam zu schützen, speichern wir die IP-Adresse deines Computers.
     </div>
-  <input type="submit" name="submit" value="Absenden!" id="submit">
+  <input type="submit" name="submit" value="Absenden!" id="submit" />
   </form>
 <?php endif; ?>
 </div>
