@@ -117,7 +117,11 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "mail($recp, ".$config['mail_subject'].", $message, $headers);";
           }
         } else {
-          mail($recp, $config['mail_subject'], $message, $headers);
+          if (!mail($recp, $config['mail_subject'], $message, $headers)) {
+            $success = false;
+            $errors[] = 'Ein Fehler ist aufgetreten (Mail konnte nicht versendet werden).';
+            break;
+          }
         }
       }
     }
