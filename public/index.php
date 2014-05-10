@@ -193,7 +193,7 @@ if (isset($_POST['message'])) {
     <div>Bitte tippe die beiden Wörter ein:</div>
     <!--ReCaptcha Start-->
     <div class="captcha-container">
-    <?php echo recaptcha_get_html($recaptcha_public_key); ?>
+    <?php echo recaptcha_get_html($recaptcha_public_key, null, true); ?>
     </div>
     <!--ReCaptcha End-->
     
