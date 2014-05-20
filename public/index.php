@@ -90,6 +90,7 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
   if (!$failed) {
     $headers = "Content-type: text/plain; charset=utf-8\r\n";
     $headers .= 'From: ' . $config['mail_from'] . "\r\n";
+    $headers .= 'Reply-To: ' . $config['mail_reply_to'] . "\r\n";
 
     $message = $config['mail_prefix'] . "\n" . $message;
 

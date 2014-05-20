@@ -28,6 +28,7 @@ $config['ratelimit'] = 20;
 $config['keep_caches'] = false;
 
 $config['mail_from'] = 'Anonymous Feedback <noreply@example.org>';
+$config['mail_reply_to'] = $config['mail_from'];
 $config['mail_subject'] = 'Anonymous Feedback';
 $config['mail_prefix'] = '';
 // Set to true to don't actually send mails
