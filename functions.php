@@ -22,13 +22,13 @@ function af_remove_old_caches($cache_file) {
 }
 
 /**
- * sanitizes a message for use in a mail message
+ * filters the user-POSTed message
  *
  * @param string $msg
- * @return string the sanitized message
+ * @return string the filtered message
  **/
-function af_sanitize_message($msg) {
-  return htmlspecialchars(trim($msg));
+function af_filter_message($msg) {
+  return trim($msg);
 }
 
 /**

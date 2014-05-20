@@ -42,7 +42,7 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
   /*
    * preparing user submitted content
   */
-  $message = af_sanitize_message($_POST['message']);
+  $message = af_filter_message($_POST['message']);
 
   /*
    * Validations
