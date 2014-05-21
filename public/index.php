@@ -67,9 +67,9 @@ if ($config['enabled'] && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $errors[] = "Bitte gib eine Nachricht ein.";
   }
   /* maximum length */
-  if (!$failed && strlen($message) > 5000) {
+  if (!$failed && strlen($message) > $config['max_length']) {
     $failed = true;
-    $errors[] = "Bitte gib nicht mehr als 5.000 Zeichen als Nachricht ein.";
+    $errors[] = "Bitte gib nicht mehr als {$config['max_length']} Zeichen als Nachricht ein.";
   }
   /* recipient */
   if (!$failed) {
@@ -194,7 +194,7 @@ if (isset($_POST['message'])) {
     <!--
     var area = document.getElementById("message");
     var message = document.getElementById("char-counter");
-    var maxLength = 5000;
+    var maxLength = <?php echo $config['max_length'] ?>;
     var checkLength = function() {
         if(area.value.length <= maxLength) {
             message.innerHTML = "Noch " + (maxLength-area.value.length) + " Zeichen.";

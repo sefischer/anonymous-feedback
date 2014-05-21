@@ -27,6 +27,10 @@ $config['ratelimit'] = 20;
 // for quantitative usage tracking.
 $config['keep_caches'] = false;
 
+// Maximum number of characters in user-sent messages
+// Use only plain integers
+$config['max_length'] = 25000;
+
 $config['mail_from'] = 'Anonymous Feedback <noreply@example.org>';
 $config['mail_reply_to'] = $config['mail_from'];
 $config['mail_subject'] = 'Anonymous Feedback';
